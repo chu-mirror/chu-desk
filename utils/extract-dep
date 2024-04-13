@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+use v5.34;
+use utf8;
+
+open DEPENDENCIES, ">>", "/tmp/chu-desk-dependencies";
+
+my $reading_dep = 0;
+
+while (<STDIN>) {
+    if (/===DEPENDENCIES===/) {
+        $reading_dep = 1;
+        next;
+    }
+    if ($reading_dep) {
+        print DEPENDENCIES;
+    }
+    else {
+        print;
+    }
+}
+

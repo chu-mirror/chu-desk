@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -e
+
+OPTIND=1
+
+verbose=0
+alter="terminal"
+
+while getopts "va:" opt; do
+  case "$opt" in
+    v) verbose=1 ;;
+    a) alter=$OPTARG
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -lt 1 ]; then
+  echo "usage: install-conf [-v] [-a alter] directory [...]"
+  exit 1
+fi
+
+# usage: install-file file
+# Install a configuration to proper place according its name.
+# If the file has a suffixe of .alter, invoke preprocessor on it.
+install_file()
+{
+  file=$1
+  file_path=`path-of $1`
+
+  tmpfile=/tmp/`basename $file`
+
+  [ $verbose -eq 1 ] && echo "Installing $file to $file_path (alter: $alter)"
+
+  [ ! -f "$tmpfile" -o $file -nt $tmpfile ] &&
+    echo "chu_desk_dependencies" \
+      | m4 -P -DCHU_DESK_ALTER=$alter include.m4 $file - \
+      | extract-dep > $tmpfile
+
+  case `basename $file` in
+    HOME* ) install -C -m 644 $tmpfile $file_path ;;
+    * ) sudo install -C -m 644 $tmpfile $file_path ;;
+  esac
+
+  rm $tmpfile
+
+  unset file
+  unset file_path
+  unset tmpfile
+}
+
+while [ $# -ne 0 ]; do
+  if [ -d $1 ]; then
+    for f in $1/*--*; do install_file $f; done
+  else
+    echo "There's no directory named $1"
+    exit 1
+  fi
+  shift 1
+done

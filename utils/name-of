@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+use v5.34;
+use utf8;
+use File::Basename;
+
+if (@ARGV != 1) {
+  die "usage: name-of path";
+}
+
+my $path = $ARGV[0];
+
+my @fields = split /\//, $path;
+shift @fields;
+
+if ($fields[0] eq 'home' && $fields[1] eq $ENV{'USER'}) {
+  shift @fields;
+  $fields[0] = 'HOME';
+} elsif ($fields[0] eq 'etc') {
+  $fields[0] = 'ETC';
+} else {
+  unshift @fields, 'ROOT';
+}
+
+print(join '--', @fields);
+

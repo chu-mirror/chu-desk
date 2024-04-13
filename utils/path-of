@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+use v5.34;
+use utf8;
+use File::Basename;
+
+if (@ARGV != 1) {
+  die "usage: path-of file-name";
+}
+
+my $file_name = fileparse($ARGV[0]);
+
+my @fields = split /--/, $file_name;
+if ($fields[0] eq 'HOME') {
+  $fields[0] = $ENV{'HOME'};
+} elsif ($fields[0] eq 'ROOT') {
+  $fields[0] = '';
+} elsif ($fields[0] eq 'ETC') {
+  $fields[0] = '/etc';
+}
+
+print(join "/", @fields);
+
