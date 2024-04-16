@@ -22,8 +22,8 @@ if [ $# -lt 1 ]; then
 fi
 
 # usage: install-file file
-# Install a configuration to proper place according its name.
-# If the file has a suffixe of .alter, invoke preprocessor on it.
+# Install a configuration to proper place according to its name.
+# Every configuration will be preprocessed by m4.
 install_file()
 {
   file=$1
