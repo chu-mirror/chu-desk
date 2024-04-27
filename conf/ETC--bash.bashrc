@@ -41,6 +41,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# the structure of context dependent directory
+CTX_HOME=.ctx
+CTX_BIN=$CTX_HOME/bin
+
+export CTX_HOME CTX_BIN
+
 # if the command-not-found package is installed, use it
 chu_desk_add_dep(command-not-found)m4_dnl
 function command_not_found_handle {
@@ -49,8 +55,8 @@ function command_not_found_handle {
   cmd=$1  # the searched command
   shift
   while [ "$sp" != "$HOME" ]; do
-    if [ -x "$sp/.bin/$cmd" ]; then
-      "$sp/.bin/$cmd" $@
+    if [ -x "$sp/$CTX_BIN/$cmd" ]; then
+      "$sp/$CTX_BIN/$cmd" $@
       unset sp; unset cmd
       return $?
     fi
