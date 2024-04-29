@@ -1,7 +1,7 @@
 PATH := $(shell realpath utils):${PATH}
 
 dependencies: /tmp/chu-desk-dependencies
-	cat $< | sort | uniq > $@
+	cat premise $< | sort | uniq > $@
 
 install:
 	@install-conf -v conf
