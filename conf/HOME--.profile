@@ -2,7 +2,7 @@
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
+    . "$HOME/.bashrc"
     fi
 fi
 
@@ -17,3 +17,4 @@ CABAL_HOME="$HOME/.cabal"
 PATH="$CABAL_HOME/bin:$PATH"
 export CABAL_HOME
 
+export EDITOR=vi
