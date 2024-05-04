@@ -17,6 +17,9 @@ if ($fields[0] eq 'HOME') {
   $fields[0] = '';
 } elsif ($fields[0] eq 'ETC') {
   $fields[0] = '/etc';
+} elsif ($fields[0] eq 'CTX') {
+  $fields[0] = '.ctx';
+  unshift @fields, $ENV{'HOME'};
 }
 
 print(join "/", @fields);
