@@ -5,4 +5,5 @@ m4_define({{chu_desk_add_dep}},
 chu_desk_dependencies
 $1)m4_dnl}}
 )m4_dnl
+m4_define({{chu_desk_username}}, {{chu}})m4_dnl
 m4_dnl
