@@ -25,9 +25,5 @@ export CARGO_HOEM
 
 export EDITOR=vi
 
-chu_desk_add_dep(global)m4_dnl
-GTAGSLABEL=new-ctags
-export GTAGSLABEL
-
 PATH="$HOME/.elan/bin:$PATH"
 
