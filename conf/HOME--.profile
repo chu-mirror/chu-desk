@@ -6,6 +6,8 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
+[ -f "$HOME/.keys" ] && . "$HOME/.keys"
+
 chu_desk_add_dep(ruby)m4_dnl
 chu_desk_add_dep(ruby-dev)m4_dnl
 GEM_HOME="$HOME/.gems"
@@ -17,4 +19,15 @@ CABAL_HOME="$HOME/.cabal"
 PATH="$CABAL_HOME/bin:$PATH"
 export CABAL_HOME
 
+CARGO_HOME="$HOME/.cargo"
+PATH="$CARGO_HOME/bin:$PATH"
+export CARGO_HOEM
+
 export EDITOR=vi
+
+chu_desk_add_dep(global)m4_dnl
+GTAGSLABEL=new-ctags
+export GTAGSLABEL
+
+PATH="$HOME/.elan/bin:$PATH"
+
