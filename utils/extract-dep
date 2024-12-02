@@ -4,8 +4,10 @@ use v5.34;
 use utf8;
 
 open DEPENDENCIES, ">>", "/tmp/chu-desk-dependencies";
+open CUSTOM_DEPENDENCIES, ">>", "/tmp/chu-desk-custom-dependencies";
 
 my $reading_dep = 0;
+my $reading_custom_dep = 0;
 
 while (<STDIN>) {
     if (/===DEPENDENCIES===/) {
@@ -15,8 +17,14 @@ while (<STDIN>) {
     if ($reading_dep) {
         print DEPENDENCIES;
     }
+    if (/===CUSTOM-DEPENDENCIES===/) {
+        $reading_custom_dep = 1;
+        next;
+    }
+    if ($reading_custom_dep) {
+        print CUSTOM_DEPENDENCIES;
+    }
     else {
         print;
     }
 }
-

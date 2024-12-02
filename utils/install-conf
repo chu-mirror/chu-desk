@@ -33,7 +33,7 @@ install_file()
   [ $verbose -eq 1 ] && echo "Installing $file to $file_path (alter: $alter)"
 
   [ -f "$tmpfile" ] && sudo rm "$tmpfile"
-  echo "chu_desk_dependencies" \
+  echo -e "chu_desk_dependencies\nchu_desk_custom_dependencies" \
     | m4 -P -DCHU_DESK_ALTER=$alter include.m4 "$file" - \
     | extract-dep > "$tmpfile"
 
@@ -50,6 +50,7 @@ install_file()
 }
 
 sudo rm -f /tmp/chu-desk-dependencies
+sudo rm -f /tmp/chu-desk-custom-dependencies
 
 while [ $# -ne 0 ]; do
   if [ -d $1 ]; then

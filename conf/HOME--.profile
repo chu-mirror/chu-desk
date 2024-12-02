@@ -19,6 +19,7 @@ CABAL_HOME="$HOME/.cabal"
 PATH="$CABAL_HOME/bin:$PATH"
 export CABAL_HOME
 
+chu_desk_add_custom_dep(cargo)m4_dnl
 CARGO_HOME="$HOME/.cargo"
 PATH="$CARGO_HOME/bin:$PATH"
 export CARGO_HOEM
