@@ -16,16 +16,9 @@ shift @fields;
 if ($fields[0] eq 'home' && $fields[1] eq $ENV{'USER'}) {
   shift @fields;
   shift @fields;
-  if ($fields[0] eq '.ctx') {
-    shift @fields;
-    unshift @fields, 'CTX';
-  } else {
-    unshift @fields, 'HOME';
-  }
+  unshift @fields, 'HOME';
 } elsif ($fields[0] eq 'etc') {
   $fields[0] = 'ETC';
-} else {
-  unshift @fields, 'ROOT';
 }
 
 print(join '--', @fields);

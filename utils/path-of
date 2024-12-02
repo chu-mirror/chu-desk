@@ -13,14 +13,8 @@ my $file_name = fileparse($ARGV[0]);
 my @fields = split /--/, $file_name;
 if ($fields[0] eq 'HOME') {
   $fields[0] = $ENV{'HOME'};
-} elsif ($fields[0] eq 'ROOT') {
-  $fields[0] = '';
 } elsif ($fields[0] eq 'ETC') {
   $fields[0] = '/etc';
-} elsif ($fields[0] eq 'CTX') {
-  $fields[0] = '.ctx';
-  unshift @fields, $ENV{'HOME'};
 }
 
 print(join "/", @fields);
-
