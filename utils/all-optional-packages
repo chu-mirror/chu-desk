@@ -1,0 +1,5 @@
+#!/bin/sh
+
+apt-mark showmanual \
+    | xargs -r dpkg-query -W -f='${Package}\t${Priority}\n' \
+    | awk '$2 == "optional" {print $1}'
