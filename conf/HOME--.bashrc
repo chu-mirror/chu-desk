@@ -74,4 +74,3 @@ alias l='ls -CF'
 
 # import context dependent configuration
 [ -f $CTX_HOME/.bashrc ] && . $CTX_HOME/.bashrc
-
