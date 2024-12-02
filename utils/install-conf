@@ -37,7 +37,8 @@ install_file()
     | m4 -P -DCHU_DESK_ALTER=$alter include.m4 "$file" - \
     | extract-dep > "$tmpfile"
 
-  case `basename $file` in
+  mkdir -p `dirname "$file_path"`
+  case `basename "$file"` in
     HOME* ) install -C -m $flag "$tmpfile" "$file_path" ;;
     * ) sudo install -C -m $flag "$tmpfile" "$file_path" ;;
   esac
