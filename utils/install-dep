@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+dep_file=$1
+all=$(cat "$dep_file")
+sudo aptitude install $all && sudo aptitude unmarkauto $all
