@@ -1,5 +1,0 @@
-.ctx
-.*env
-*.egg-info
-dist
-*cache*
