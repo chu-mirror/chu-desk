@@ -34,4 +34,3 @@ if [ "${PS1-}" ]; then
     fi
   fi
 fi
-

@@ -1,11 +1,3 @@
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-    . "$HOME/.bashrc"
-    fi
-fi
-
 [ -f "$HOME/.keys" ] && . "$HOME/.keys"
 
 chu_desk_add_dep(ruby)m4_dnl
@@ -27,3 +19,11 @@ export CARGO_HOEM
 m4_dnl I prefer vis than vim
 chu_desk_add_dep(vis)m4_dnl
 export EDITOR=vi
+
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
+    fi
+fi

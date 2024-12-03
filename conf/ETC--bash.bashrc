@@ -31,15 +31,8 @@ xterm*|rxvt*)
   ;;
 esac
 
-# enable bash completion in interactive shells
 chu_desk_add_dep(bash-completion)m4_dnl
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
+. /usr/share/bash-completion/bash_completion
 
 chu_desk_add_dep(command-not-found)m4_dnl
 function command_not_found_handle {
