@@ -52,27 +52,8 @@ the definition given by Emacs.
   (require 'project)
 #+end_src
 
-Emacs can not find the true root of project in case there are
-submodules of submodules. This helper function recursively
-call 'project-try-vc' until the result unchanged.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
-  (defun my-stabilize-on (f v)
-    (let ((new-v (funcall f v)))
-      (if (equal new-v v)
-  	v
-        (my-stabilize-on f new-v))))
-
-  (defun my--project-try-vc (tag-d)
-    (project-try-vc (caddr tag-d)))
-  	
-  (defun my-find-vc-root (d)
-    (my-stabilize-on 'my--project-try-vc (project-try-vc d)))
-#+end_src
-
 #+begin_src emacs-lisp
   (setq project-mode-line t)
-  (add-to-list 'project-find-functions 'my-find-vc-root)
 #+end_src
 
 ** Session
