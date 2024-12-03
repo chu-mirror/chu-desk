@@ -12,19 +12,21 @@ my $reading_custom_dep = 0;
 while (<STDIN>) {
     if (/===DEPENDENCIES===/) {
         $reading_dep = 1;
+	$reading_custom_dep = 0;
+        next;
+    }
+    if (/===CUSTOM-DEPENDENCIES===/) {
+        $reading_dep = 0;
+        $reading_custom_dep = 1;
         next;
     }
     if ($reading_dep) {
         print DEPENDENCIES;
-    }
-    if (/===CUSTOM-DEPENDENCIES===/) {
-        $reading_custom_dep = 1;
-        next;
+	next;
     }
     if ($reading_custom_dep) {
         print CUSTOM_DEPENDENCIES;
+	next;
     }
-    else {
-        print;
-    }
+    print;
 }
