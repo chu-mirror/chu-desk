@@ -1,5 +1,5 @@
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb no-export :tangle yes
+:header-args:emacs-lisp: :noweb no-export :tangle yes :noweb-sep " "
 :END:
 #+STARTUP: content
 
@@ -26,12 +26,16 @@ functions have a name starting with 'my', and if it's only used in this file,
 #+end_src
 
 * Package Management
+I use the macro 'use-package' to manage packages, which is distributed with Emacs from 29.1,
+including installing, configuring.
 
+To automatically install the used packages, this option is enabled.
 #+begin_src emacs-lisp
   (setq use-package-always-ensure t)
 #+end_src
 
 * Appearance
+Here is some basic settings for a not disturbing looking.
 
 #+begin_src emacs-lisp
   (tool-bar-mode -1)
@@ -41,7 +45,71 @@ functions have a name starting with 'my', and if it's only used in this file,
   	     '(font . "DejaVu Sans Mono-17"))
 #+end_src
 
-* Workflow
+* Action
+People believe that Emacs is a general purpose interface to
+computing infrastructure rather than just an editor. It's correct
+in some extent. Of course, Emacs can not compete a real operating system,
+but for a limited set of actions, Emacs can do amazingly well.
+Action here means "copying a file into a directory", "modifying some code", etc.
+
+This chapter explains the set of actions that I perform on Emacs,
+and makes them more efficient.
+
+** Activity
+Related actions are usually taken in a common context, like renaming, deleting, moving
+file in Windows' file explorer. Emacs's command and buffer is also such
+an example, but sometimes we would like to have multiple cooperating buffers to
+achieve some bigger objects. For example, using gdb to debug a C program
+usually requires multiple buffers, one to show current state of the running program,
+one to show referenced source code, one to instruct gdb, etc. Not only it involves
+multiple buffers, but also it consists of a serial of commands to fully accomplish
+its object.
+I call such long lasting actions as activities, in contrast with commands in Emacs
+that have immediate effect.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defvar my-activities '(<<my activities>>))
+
+  (defun my-activityp (av)
+    (not (not (member av my-activities))))
+#+end_src
+
+There's an activity for default behaviour when no activity specified.
+#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+  emacs
+#+end_src
+
+Some mechanisms should be used to specify which activity is being taken. I use tab bar
+for this task. Each tab has an activity attached. To take an activity means
+open a new tab, and that tab has the activity attached.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defun my-tab-activity (tab-number)
+    (let* ((tabs (funcall tab-bar-tabs-function))
+  	 (tab-index (1- tab-number))
+  	 (tab (nth tab-index tabs)))
+      (alist-get 'my-activity tab 'emacs)))
+
+  (defun my-current-activity (&optional tab-number)
+    (interactive)
+    (let ((av (my-tab-activity (or tab-number (1+ (tab-bar--current-tab-index))))))
+      (message "The current activity: %s" (symbol-name av))))
+
+  (defun my-take-activity (avn)
+    "Start taking the activity in a new tab"
+    (interactive
+     (list (completing-read (format-prompt "The activity to take" "emacs")
+  			  my-activities)))
+    (tab-bar-new-tab)
+    (let ((av (intern avn))
+  	(tab (tab-bar--current-tab-find)))
+      (if (my-activityp av)
+  	(nconc tab `((my-activity . ,av)))
+        (user-error "No such activity: %s" avn))))
+#+end_src
+
+The context of activities consists of a set of buffers, a set of window configurations,
+a current state, some activity specific commands.
 
 ** Project
 All actions towards a particular codebase are gatherred in
@@ -86,6 +154,10 @@ Different editing points are seperated to different tabs.
   (setq dired-listing-switches "-ahl")
   (setq dired-isearch-filenames t)
   (setq org-confirm-babel-evaluate nil)
+  (global-set-key (kbd "C-M-h") 'windmove-left)
+  (global-set-key (kbd "C-M-j") 'windmove-down)
+  (global-set-key (kbd "C-M-k") 'windmove-up)
+  (global-set-key (kbd "C-M-l") 'windmove-right)
 #+end_src
 
 * Packages
@@ -141,3 +213,6 @@ Different editing points are seperated to different tabs.
      '(rime-predicate-after-alphabet-char-p
        rime-predicate-prog-in-code-p)))
 #+end_src
+
+* Bibliography
+- [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
