@@ -26,8 +26,8 @@ functions have a name starting with 'my', and if it's only used in this file,
 #+end_src
 
 * Package Management
-I use the macro 'use-package' to manage packages, which is distributed with Emacs from 29.1,
-including installing, configuring.
+I use the macro 'use-package' to manage packages,
+which is distributed with Emacs from 29.1, including installing, configuring.
 
 To automatically install the used packages, this option is enabled.
 #+begin_src emacs-lisp
@@ -81,7 +81,7 @@ There's an activity for default behaviour when no activity specified.
 
 Some mechanisms should be used to specify which activity is being taken. I use tab bar
 for this task. Each tab has an activity attached. To take an activity means
-open a new tab, and that tab has the activity attached.
+work on a new tab, and that tab has the activity attached.
 
 #+begin_src emacs-lisp :tangle no :noweb-ref helpers
   (defun my-tab-activity (tab-number)
@@ -96,11 +96,12 @@ open a new tab, and that tab has the activity attached.
       (message "The current activity: %s" (symbol-name av))))
 
   (defun my-take-activity (avn)
-    "Start taking the activity in a new tab"
+    "Start taking the activity in a new tab."
     (interactive
      (list (completing-read (format-prompt "The activity to take" "emacs")
   			  my-activities)))
     (tab-bar-new-tab)
+    (tab-bar-rename-tab avn)
     (let ((av (intern avn))
   	(tab (tab-bar--current-tab-find)))
       (if (my-activityp av)
@@ -108,32 +109,46 @@ open a new tab, and that tab has the activity attached.
         (user-error "No such activity: %s" avn))))
 #+end_src
 
-The context of activities consists of a set of buffers, a set of window configurations,
+The context of activities consists of a set of buffers, a set of rules to display buffers,
 a current state, some activity specific commands.
+
+I will not assign each buffer a single activity, because different activities might
+deal with same buffer at the same time. For example, if I regard editing source file
+and debugging as two different activities, then which activity should I assign for
+the source file both for editing and debuging?
+So I decide to delay the determination of the set of buffers
+involved in a particular activity to the time I really need to deal with the set.
+Maybe to use ibuffer.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+#+end_src
+
+As for the set of rules to display buffers, a simple strategy is to customize
+the displaying when the buffer satisfies some criteria and the current activity has
+regulation on it. The following helper creates conditions for display-buffer-alist.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defun my-current-activity-is (av)
+    (lambda (b) (eq av (my-current-activity))))
+#+end_src
+
+The state of activities is limited to the ones desktop.el can save.
+
+#+begin_src emacs-lisp
+  (desktop-save-mode 1)
+#+end_src
+
+Beside this, some preparation can be done to get a comfortable state
+before embarking on an activity.
 
 ** Project
 All actions towards a particular codebase are gatherred in
 a project-based session. The meaning of project here follows
 the definition given by Emacs.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref dependencies
-  (require 'project)
-#+end_src
-
 #+begin_src emacs-lisp
   (setq project-mode-line t)
-#+end_src
-
-** Session
-Emacs only supports constant paths to search for the desktop file.
-So this is the most dynamic way I can use to specify search path.
-The custom here is to go to the root of the project, run Emacs, then
-Emacs will create a new session or continue the previous session
-based on this directory.
-
-#+begin_src emacs-lisp
-  (setq desktop-path '("."))
-  (desktop-save-mode 1)
 #+end_src
 
 ** Editing
