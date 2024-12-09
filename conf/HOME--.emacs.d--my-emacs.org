@@ -1,5 +1,5 @@
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb no-export :tangle yes :noweb-sep " "
+:header-args:emacs-lisp: :noweb no-export :tangle yes
 :END:
 #+STARTUP: content
 
@@ -69,7 +69,10 @@ I call such long lasting actions as activities, in contrast with commands in Ema
 that have immediate effect.
 
 #+begin_src emacs-lisp :tangle no :noweb-ref helpers
-  (defvar my-activities '(<<my activities>>))
+  (defvar my-activities
+    '(
+      <<my activities>>
+      ))
 
   (defun my-activityp (av)
     (not (not (member av my-activities))))
@@ -112,7 +115,9 @@ work on a new tab, and that tab has the activity attached.
     (let ((av (intern avn))
   	(tab (tab-bar--current-tab-find)))
       (if (my-activityp av)
-  	(progn <<initialization of av on tab>>)
+  	(progn
+  	  <<initialization of av on tab>>
+  	  )
         (user-error "No such activity: %s" avn))))
 #+end_src
 
