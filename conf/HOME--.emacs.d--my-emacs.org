@@ -245,7 +245,7 @@ of source code directly. LSP is good for this purpose.
      (lean4-mode . eglot-ensure)))
 #+end_src
 
-*** Project: File System
+*** Project: File
 I use project.el for this job.
 
 - project-find-file (C-x p f)
@@ -257,7 +257,16 @@ I use project.el for this job.
   (use-package magit)
 #+end_src
 
-*** File System: File System
+*** File System: File
+A shortcut to access the directory that contains all local repositories.
+
+#+begin_src emacs-lisp
+  (defun my--dired-reps ()
+    (interactive)
+    (dired (getenv "REPOSITORY_HOME")))
+
+  (global-set-key (kbd "C-x c d") 'my--dired-reps)
+#+end_src
 
 #+begin_src emacs-lisp
   (setq dired-maybe-use-globstar t)

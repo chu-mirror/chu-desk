@@ -1,5 +1,10 @@
 [ -f "$HOME/.keys" ] && . "$HOME/.keys"
 
+REPOSITORY_HOME="$HOME/reps"
+export REPOSITORY_HOME
+
+[ -d "$REPOSITORY_HOME" ] || mkdir -p "$REPOSITORY_HOME"
+
 chu_desk_add_dep(ruby)m4_dnl
 chu_desk_add_dep(ruby-dev)m4_dnl
 GEM_HOME="$HOME/.gems"
