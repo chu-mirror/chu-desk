@@ -43,6 +43,7 @@ Here is some basic settings for a not disturbing looking.
   (menu-bar-mode -1)
   (add-to-list 'default-frame-alist
   	     '(font . "DejaVu Sans Mono-17"))
+  (setq project-mode-line t)
 #+end_src
 
 * Action
@@ -52,7 +53,7 @@ in some extent. Of course, Emacs can not compete a real operating system,
 but for a limited set of actions, Emacs can do amazingly well.
 Action here means "copying a file into a directory", "modifying some code", etc.
 
-This chapter explains the set of actions that I perform on Emacs,
+This file's main purpose is to explain the set of actions that I perform on Emacs,
 and makes them more efficient.
 
 ** Activity
@@ -83,6 +84,12 @@ Some mechanisms should be used to specify which activity is being taken. I use t
 for this task. Each tab has an activity attached. To take an activity means
 work on a new tab, and that tab has the activity attached.
 
+#+begin_src emacs-lisp
+  (setq tab-bar-tab-hints t)
+  (setq tab-bar-select-tab-modifiers '(control))
+  (tab-bar-mode)
+#+end_src
+
 #+begin_src emacs-lisp :tangle no :noweb-ref helpers
   (defun my-tab-activity (tab-number)
     (let* ((tabs (funcall tab-bar-tabs-function))
@@ -105,8 +112,12 @@ work on a new tab, and that tab has the activity attached.
     (let ((av (intern avn))
   	(tab (tab-bar--current-tab-find)))
       (if (my-activityp av)
-  	(nconc tab `((my-activity . ,av)))
+  	(progn <<initialization of av on tab>>)
         (user-error "No such activity: %s" avn))))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of av on tab"
+  (nconc tab `((my-activity . ,av)))
 #+end_src
 
 The context of activities consists of a set of buffers, a set of rules to display buffers,
@@ -142,48 +153,79 @@ The state of activities is limited to the ones desktop.el can save.
 Beside this, some preparation can be done to get a comfortable state
 before embarking on an activity.
 
-** Project
-All actions towards a particular codebase are gatherred in
-a project-based session. The meaning of project here follows
-the definition given by Emacs.
-
-#+begin_src emacs-lisp
-  (setq project-mode-line t)
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defvar my-activity-initial-commands '())
 #+end_src
 
-** Editing
-Instead of editing multiple files at same time in different windows
-of a frame, I preserve screen space for referencing when editing.
-Different editing points are seperated to different tabs.
-
-#+begin_src emacs-lisp
-  (setq tab-bar-tab-hints t)
-  (setq tab-bar-select-tab-modifiers '(control))
-  (tab-bar-mode)
+#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of av on tab"
+  (let ((cmds (alist-get av my-activity-initial-commands)))
+    (when cmds
+      (funcall cmds)))
 #+end_src
 
-* Miscellaneous
+** Searching and Editing
+These two concepts are too closly binded to explain one while ignoring another.
+You must know what to edit to define objects to search, and you must know
+where the object is to perform an editing.
+
+There's a general purpose framework to select a particular object
+from a set of candidate. I introduce it here because it's used everywhere.
 
 #+begin_src emacs-lisp
-  (setq dired-maybe-use-globstar t)
-  (setq dired-listing-switches "-ahl")
-  (setq dired-isearch-filenames t)
-  (setq org-confirm-babel-evaluate nil)
-  (global-set-key (kbd "C-M-h") 'windmove-left)
-  (global-set-key (kbd "C-M-j") 'windmove-down)
-  (global-set-key (kbd "C-M-k") 'windmove-up)
-  (global-set-key (kbd "C-M-l") 'windmove-right)
-#+end_src
-
-* Packages
-
-#+begin_src emacs-lisp
-  (use-package python
+  (use-package helm
+    :demand t
     :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     (cons '(python . t) org-babel-load-languages)))
+    (helm-mode 1)
+    :bind
+    (("M-x" . helm-M-x)
+     ("C-x r b" . helm-filtered-bookmarks)
+     ("C-x C-f" . helm-find-files)))
+#+end_src
 
+The following sections are named following a pattern of "SCOPE: TYPE OF OBJECT".
+
+*** File: Plain Text
+If the searching and the editing is limited in a single file,
+I prefer vi's key bindings than Emacs's originals.
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :demand t
+    :config
+    (evil-mode 1)
+    (evil-set-initial-state 'Info-mode 'emacs)
+    (evil-set-initial-state 'dired-mode 'emacs)
+    (evil-set-initial-state 'Man-mode 'emacs)
+    (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+    (evil-set-initial-state 'help-mode 'emacs))
+  (use-package evil-org
+    :hook org-mode)
+#+end_src
+
+I sometimes input CJK characters.
+
+chu_desk_add_dep(librime-dev)
+#+begin_src emacs-lisp
+  (use-package rime
+    :custom
+    (default-input-method "rime")
+    (rime-disable-predicates
+     '(rime-predicate-after-alphabet-char-p
+       rime-predicate-prog-in-code-p)))
+#+end_src
+
+*** Project: Plain Text
+I use project.el for this job.
+
+- project-find-regexp (C-x p g)
+- project-search
+- project-query-replace-regexp (C-x p r)
+
+*** Project: Source Code
+It's convenient if we can go beyond plain text, and operate on the structure
+of source code directly. LSP is good for this purpose.
+
+#+begin_src emacs-lisp
   (use-package eglot
     :custom (eglot-extend-to-xref t)
     :config
@@ -196,38 +238,48 @@ Different editing points are seperated to different tabs.
      (c++-mode . eglot-ensure)
      (python-mode . eglot-ensure)
      (lean4-mode . eglot-ensure)))
+#+end_src
 
-  (use-package helm
-    :demand t
-    :config
-    (helm-mode 1)
-    :bind
-    (("M-x" . helm-M-x)
-     ("C-x r b" . helm-filtered-bookmarks)
-     ("C-x C-f" . helm-find-files)))
+*** Project: File System
+I use project.el for this job.
 
-  (use-package evil
-    :demand t
-    :config
-    (evil-mode 1)
-    (evil-set-initial-state 'Info-mode 'emacs)
-    (evil-set-initial-state 'dired-mode 'emacs)
-    (evil-set-initial-state 'Man-mode 'emacs)
-    (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
-    (evil-set-initial-state 'help-mode 'emacs))
+- project-find-file (C-x p f)
+- project-dired (C-x p D)
 
-  (use-package evil-org
-    :hook org-mode)
+*** Project: Git Repository
 
+#+begin_src emacs-lisp
   (use-package magit)
+#+end_src
 
-  (use-package rime
-    :custom
-    (default-input-method "rime")
-    (rime-disable-predicates
-     '(rime-predicate-after-alphabet-char-p
-       rime-predicate-prog-in-code-p)))
+*** File System: File System
+
+#+begin_src emacs-lisp
+  (setq dired-maybe-use-globstar t)
+  (setq dired-listing-switches "-ahl")
+  (setq dired-isearch-filenames t)
+#+end_src
+** Meta
+This set of actions take effect on Emacs, like buffer, window, etc, which
+can not be classified in previous chapters.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-h") 'windmove-left)
+  (global-set-key (kbd "C-M-j") 'windmove-down)
+  (global-set-key (kbd "C-M-k") 'windmove-up)
+  (global-set-key (kbd "C-M-l") 'windmove-right)
+#+end_src
+* Miscellaneous
+
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+  (use-package python
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     (cons '(python . t) org-babel-load-languages)))
 #+end_src
 
 * Bibliography
 - [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
+  
