@@ -125,6 +125,27 @@ work on a new tab, and that tab has the activity attached.
   (nconc tab `((my-activity . ,av)))
 #+end_src
 
+I bind these activity related commands under C-x a. This will override
+keybindings for abbreviation, but it doesn't matter because I don't use them.
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defvar-keymap my-activity-keymap
+    :doc "Keymap for my activity related commands"
+    "t" #'my-take-activity
+    "c" #'my-current-activity)
+
+  (defvar my-activity-specific-keymaps '())
+#+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x a") my-activity-keymap)
+  (add-to-list
+   'tab-bar-tab-post-select-functions
+   (lambda (ft tt)
+     (let ((av (alist-get 'my-activity tt)))
+       (keymap-set my-activity-keymap "a"
+  		 (alist-get av my-activity-specific-keymaps)))))
+#+end_src
+
 The context of activities consists of a set of buffers, a set of rules to display buffers,
 a current state, some activity specific commands.
 
