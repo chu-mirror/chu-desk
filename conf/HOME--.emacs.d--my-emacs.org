@@ -116,12 +116,12 @@ work on a new tab, and that tab has the activity attached.
   	(tab (tab-bar--current-tab-find)))
       (if (my-activityp av)
   	(progn
-  	  <<initialization of av on tab>>
+  	  <<initialization of |av| on |tab|>>
   	  )
         (user-error "No such activity: %s" avn))))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of av on tab"
+#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
   (nconc tab `((my-activity . ,av)))
 #+end_src
 
@@ -158,14 +158,20 @@ The state of activities is limited to the ones desktop.el can save.
 Beside this, some preparation can be done to get a comfortable state
 before embarking on an activity.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
-  (defvar my-activity-initial-commands '())
+#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
+  (let ((funcs
+         (alist-get av
+  		  `(
+  		    <<init functions of activities>>
+  		    ))))
+    (dolist (f funcs)
+      (funcall f)))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of av on tab"
-  (let ((cmds (alist-get av my-activity-initial-commands)))
-    (when cmds
-      (funcall cmds)))
+The default activity emacs are initialized to a single window displaying
+buffer scratch.
+#+begin_src emacs-lisp :tangle no :noweb-ref "init functions of activities"
+  (emacs ,(lambda () (display-buffer "*scratch*" '(display-buffer-full-frame))))
 #+end_src
 
 ** Searching and Editing
@@ -273,6 +279,7 @@ A shortcut to access the directory that contains all local repositories.
   (setq dired-listing-switches "-ahl")
   (setq dired-isearch-filenames t)
 #+end_src
+
 ** Meta
 This set of actions take effect on Emacs, like buffer, window, etc, which
 can not be classified in previous chapters.
