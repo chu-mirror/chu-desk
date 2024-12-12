@@ -134,17 +134,36 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
     "c" #'my-current-activity)
 
   (defvar my-activity-specific-keymaps '())
+  
+  (defun my--set-activity-specific-keymap (av)
+    (global-set-key (kbd "C-x a")
+  		  (alist-get av my-activity-specific-keymaps)))
 #+end_src
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-x a") my-activity-keymap)
   (add-to-list
    'tab-bar-tab-post-select-functions
    (lambda (ft tt)
      (let ((av (alist-get 'my-activity tt)))
-       (keymap-set my-activity-keymap "a"
-  		 (alist-get av my-activity-specific-keymaps)))))
+       (my--set-activity-specific-keymap av))))
+
+  (add-hook
+   'desktop-after-read-hook
+   (lambda ()
+     (let ((av (my-tab-activity (1+ (tab-bar--current-tab-index)))))
+       (my--set-activity-specific-keymap av))))
 #+end_src
+
+Activity specific keymaps inherit from my-activity-keymap.
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+    (defvar-keymap my-activity-emacs-keymap
+      :doc "Keymap for my activity emacs related commands"
+      :parent my-activity-keymap)
+
+    (add-to-list 'my-activity-specific-keymaps
+    	     `(emacs . ,my-activity-emacs-keymap))
+#+end_src
+
 
 The context of activities consists of a set of buffers, a set of rules to display buffers,
 a current state, some activity specific commands.
@@ -268,8 +287,7 @@ of source code directly. LSP is good for this purpose.
     :hook
     ((c-mode . eglot-ensure)
      (c++-mode . eglot-ensure)
-     (python-mode . eglot-ensure)
-     (lean4-mode . eglot-ensure)))
+     (python-mode . eglot-ensure)))
 #+end_src
 
 *** Project: File
@@ -288,11 +306,11 @@ I use project.el for this job.
 A shortcut to access the directory that contains all local repositories.
 
 #+begin_src emacs-lisp
-  (defun my--dired-reps ()
+  (defun my-dired-reps ()
     (interactive)
     (dired (getenv "REPOSITORY_HOME")))
 
-  (global-set-key (kbd "C-x c d") 'my--dired-reps)
+  (global-set-key (kbd "C-x c d") 'my-dired-reps)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -321,6 +339,34 @@ can not be classified in previous chapters.
      'org-babel-load-languages
      (cons '(python . t) org-babel-load-languages)))
 #+end_src
+
+* General Editing
+The most important activity is undoubtedly editing.
+This chapter gives a common settings for all specific editing activities.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+  editing
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+    (defvar-keymap my-activity-editing-keymap
+      :doc "Keymap for my activity editing related commands"
+      :parent my-activity-keymap)
+
+    (add-to-list 'my-activity-specific-keymaps
+    	     `(editing . ,my-activity-editing-keymap))
+#+end_src
+
+Some people might think of writing as simply output of thought,
+but it's actually a combination of input and output. When writing, writers of
+articles have to check dictionaries, writers of research papers have to
+read other papers, writer of code, or programmer, have to check
+document, other part of code, debugging output, to get thought clearer
+and eventually let thought flow out.
+
+Reading is indivisible from writing. To make reading more comfortable
+when writing, I seperate the root window to two parts:
+editing part and referencing part.
 
 * Bibliography
 - [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
