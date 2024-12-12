@@ -6,6 +6,8 @@ dependencies: /tmp/chu-desk-dependencies
 custom-dependencies: /tmp/chu-desk-custom-dependencies
 	cat $< | sort | uniq > $@
 
+dep: dependencies custom-dependencies
+
 install:
 	@install-conf -v conf
 
