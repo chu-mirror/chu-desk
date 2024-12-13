@@ -1,5 +1,5 @@
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb no-export :tangle yes
+:header-args:emacs-lisp: :noweb no-export :tangle no
 :END:
 #+STARTUP: content
 
@@ -15,7 +15,7 @@ the configuring. The same reason is also applied to helpers. All helper
 functions have a name starting with 'my', and if it's only used in this file,
 'my' is followed by '--', else '-'.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (setq package-archives
         '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
           ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
@@ -30,14 +30,14 @@ I use the macro 'use-package' to manage packages,
 which is distributed with Emacs from 29.1, including installing, configuring.
 
 To automatically install the used packages, this option is enabled.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (setq use-package-always-ensure t)
 #+end_src
 
 * Appearance
 Here is some basic settings for a not disturbing looking.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (tool-bar-mode -1)
   (set-scroll-bar-mode nil)
   (menu-bar-mode -1)
@@ -68,7 +68,7 @@ its object.
 I call such long lasting actions as activities, in contrast with commands in Emacs
 that have immediate effect.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defvar my-activities
     '(
       <<my activities>>
@@ -79,7 +79,7 @@ that have immediate effect.
 #+end_src
 
 There's an activity for default behaviour when no activity specified.
-#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+#+begin_src emacs-lisp :noweb-ref "my activities"
   emacs
 #+end_src
 
@@ -87,13 +87,13 @@ Some mechanisms should be used to specify which activity is being taken. I use t
 for this task. Each tab has an activity attached. To take an activity means
 work on a new tab, and that tab has the activity attached.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (setq tab-bar-tab-hints t)
   (setq tab-bar-select-tab-modifiers '(control))
   (tab-bar-mode)
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defun my-tab-activity (tab-number)
     (let* ((tabs (funcall tab-bar-tabs-function))
   	 (tab-index (1- tab-number))
@@ -121,13 +121,13 @@ work on a new tab, and that tab has the activity attached.
         (user-error "No such activity: %s" avn))))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
+#+begin_src emacs-lisp :noweb-ref "initialization of |av| on |tab|"
   (nconc tab `((my-activity . ,av)))
 #+end_src
 
 I bind these activity related commands under C-x a. This will override
 keybindings for abbreviation, but it doesn't matter because I don't use them.
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-keymap
     :doc "Keymap for my activity related commands"
     "t" #'my-take-activity
@@ -140,11 +140,11 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
   		  (alist-get av my-activity-specific-keymaps)))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
+#+begin_src emacs-lisp :noweb-ref "initialization of |av| on |tab|"
   (my--set-activity-specific-keymap av)
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (add-to-list
    'tab-bar-tab-post-select-functions
    (lambda (ft tt)
@@ -159,7 +159,7 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
 #+end_src
 
 Activity specific keymaps inherit from my-activity-keymap.
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
     (defvar-keymap my-activity-emacs-keymap
       :doc "Keymap for my activity 'emacs' related commands"
       :parent my-activity-keymap)
@@ -179,7 +179,7 @@ So I decide to delay the determination of the set of buffers
 involved in a particular activity to the time I really need to deal with the set.
 Maybe to use ibuffer.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+end_src
 
@@ -187,21 +187,41 @@ As for the set of rules to display buffers, a simple strategy is to customize
 the displaying when the buffer satisfies some criteria and the current activity has
 regulation on it. The following helper creates conditions for display-buffer-alist.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defun my-current-activity-is (av)
     (lambda (b) (eq av (my-current-activity))))
 #+end_src
 
 The state of activities is limited to the ones desktop.el can save.
+Some activities might dont need to save state. Close the corresponding tabs
+when quiting Emacs.
 
-#+begin_src emacs-lisp
-  (desktop-save-mode 1)
+#+begin_src emacs-lisp :noweb-ref helpers
+  (defun my-activity-discard-state-p (av)
+    (memq av '(
+  	     <<activities to discard state>>
+  	     )))
 #+end_src
 
-Beside this, some preparation can be done to get a comfortable state
+#+begin_src emacs-lisp :noweb-ref "activities to discard state"
+  emacs
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (desktop-save-mode 1)
+
+  (add-hook
+   'desktop-save-hook
+   (lambda ()
+     (dolist (tab (tab-bar-tabs))
+       (when (my-activity-discard-state-p (alist-get 'my-activity tab))
+         (tab-bar-close-tab (1+ (tab-bar--tab-index tab)))))))
+#+end_src
+
+Some preparation can be done to get a comfortable state
 before embarking on an activity.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defun my-activity-init (av)
     (let ((funcs
   	 (alist-get av
@@ -212,13 +232,13 @@ before embarking on an activity.
         (funcall f))))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
+#+begin_src emacs-lisp :noweb-ref "initialization of |av| on |tab|"
   (my-activity-init av)
 #+end_src
 
 The default activity emacs are initialized to a single window displaying
 buffer scratch.
-#+begin_src emacs-lisp :tangle no :noweb-ref "init functions of activities"
+#+begin_src emacs-lisp :noweb-ref "init functions of activities"
   (emacs ,(lambda () (display-buffer "*scratch*" '(display-buffer-full-frame))))
 #+end_src
 
@@ -230,7 +250,7 @@ where the object is to perform an editing.
 There's a general purpose framework to select a particular object
 from a set of candidate. I introduce it here because it's used everywhere.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (use-package helm
     :demand t
     :config
@@ -247,7 +267,7 @@ The following sections are named following a pattern of "SCOPE: TYPE OF OBJECT".
 If the searching and the editing is limited in a single file,
 I prefer vi's key bindings than Emacs's originals.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (use-package evil
     :demand t
     :config
@@ -264,7 +284,7 @@ I prefer vi's key bindings than Emacs's originals.
 I sometimes input CJK characters.
 
 chu_desk_add_dep(librime-dev)
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (use-package rime
     :custom
     (default-input-method "rime")
@@ -284,7 +304,7 @@ I use project.el for this job.
 It's convenient if we can go beyond plain text, and operate on the structure
 of source code directly. LSP is good for this purpose.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (use-package eglot
     :custom (eglot-extend-to-xref t)
     :config
@@ -299,21 +319,13 @@ of source code directly. LSP is good for this purpose.
 #+end_src
 
 *** Project: File
-I use project.el for this job.
-
 - project-find-file (C-x p f)
 - project-dired (C-x p D)
-
-*** Project: Git Repository
-
-#+begin_src emacs-lisp
-  (use-package magit)
-#+end_src
 
 *** File System: File
 A shortcut to access the directory that contains all local repositories.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (defun my-dired-reps ()
     (interactive)
     (dired (getenv "REPOSITORY_HOME")))
@@ -321,7 +333,7 @@ A shortcut to access the directory that contains all local repositories.
   (global-set-key (kbd "C-x c d") 'my-dired-reps)
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (setq dired-maybe-use-globstar t)
   (setq dired-listing-switches "-ahl")
   (setq dired-isearch-filenames t)
@@ -331,7 +343,7 @@ A shortcut to access the directory that contains all local repositories.
 This set of actions take effect on Emacs, like buffer, window, etc, which
 can not be classified in previous chapters.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (global-set-key (kbd "C-M-h") 'windmove-left)
   (global-set-key (kbd "C-M-j") 'windmove-down)
   (global-set-key (kbd "C-M-k") 'windmove-up)
@@ -342,11 +354,11 @@ can not be classified in previous chapters.
 The most important activity is undoubtedly editing.
 This chapter gives a common settings for all specific editing activities.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+#+begin_src emacs-lisp :noweb-ref "my activities"
   editing
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-editing-keymap
     :doc "Keymap for my activity 'editing' related commands"
     :parent my-activity-keymap)
@@ -372,7 +384,7 @@ editing area. In this case, referencing area is nil.
 This setting is good for a screen of normal size, for usually I
 use only two columns of windows.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defun my-activity-editing-area (&optional window)
     (let* ((win (or window (selected-window)))
   	 (root (frame-root-window win)))
@@ -405,13 +417,13 @@ use only two columns of windows.
 
 After the determination of area, there are some convenient commands.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+#+begin_src emacs-lisp :noweb-ref helpers
   (defun my-activity-editing-close-referencing-area (&optional window)
     (interactive)
     (delete-window (my-activity-editing-referencing-area window)))
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
 #+end_src
 
@@ -420,11 +432,20 @@ I use magit for this job. It's an useful package, but the using is
 itself an activity, so I should give it a dedicated label in my
 framework.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+#+begin_src emacs-lisp :noweb-ref "my activities"
   magit
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+The state of magit is not so useful.
+#+begin_src emacs-lisp :noweb-ref "activities to discard state"
+  magit
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref dependencies
+  (use-package magit)
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-magit-keymap
     :doc "Keymap for my activity 'magit' related commands"
     :parent my-activity-keymap)
@@ -433,18 +454,18 @@ framework.
   	     `(magit . ,my-activity-magit-keymap))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref "init functions of activities"
+#+begin_src emacs-lisp :noweb-ref "init functions of activities"
   (magit ,(lambda () (magit)))
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (add-to-list 'display-buffer-alist
   	     '("magit: *" (display-buffer-full-frame)))
 #+end_src
 
 * Org File
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
   (setq org-src-window-setup 'split-window-below)  
   (setq org-confirm-babel-evaluate nil)
   (use-package python
