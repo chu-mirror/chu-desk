@@ -161,13 +161,12 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
 Activity specific keymaps inherit from my-activity-keymap.
 #+begin_src emacs-lisp :tangle no :noweb-ref helpers
     (defvar-keymap my-activity-emacs-keymap
-      :doc "Keymap for my activity emacs related commands"
+      :doc "Keymap for my activity 'emacs' related commands"
       :parent my-activity-keymap)
 
     (add-to-list 'my-activity-specific-keymaps
     	     `(emacs . ,my-activity-emacs-keymap))
 #+end_src
-
 
 The context of activities consists of a set of buffers, a set of rules to display buffers,
 a current state, some activity specific commands.
@@ -202,14 +201,19 @@ The state of activities is limited to the ones desktop.el can save.
 Beside this, some preparation can be done to get a comfortable state
 before embarking on an activity.
 
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defun my-activity-init (av)
+    (let ((funcs
+  	 (alist-get av
+  		    `(
+  		      <<init functions of activities>>
+  		      ))))
+      (dolist (f funcs)
+        (funcall f))))
+#+end_src
+
 #+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
-  (let ((funcs
-         (alist-get av
-  		  `(
-  		    <<init functions of activities>>
-  		    ))))
-    (dolist (f funcs)
-      (funcall f)))
+  (my-activity-init av)
 #+end_src
 
 The default activity emacs are initialized to a single window displaying
@@ -343,12 +347,12 @@ This chapter gives a common settings for all specific editing activities.
 #+end_src
 
 #+begin_src emacs-lisp :tangle no :noweb-ref helpers
-    (defvar-keymap my-activity-editing-keymap
-      :doc "Keymap for my activity editing related commands"
-      :parent my-activity-keymap)
+  (defvar-keymap my-activity-editing-keymap
+    :doc "Keymap for my activity 'editing' related commands"
+    :parent my-activity-keymap)
 
-    (add-to-list 'my-activity-specific-keymaps
-    	     `(editing . ,my-activity-editing-keymap))
+  (add-to-list 'my-activity-specific-keymaps
+  	     `(editing . ,my-activity-editing-keymap))
 #+end_src
 
 Some people might think of writing as simply output of thought,
@@ -409,6 +413,33 @@ After the determination of area, there are some convenient commands.
 
 #+begin_src emacs-lisp
   (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
+#+end_src
+
+* Using Git
+I use magit for this job. It's an useful package, but the using is
+itself an activity, so I should give it a dedicated label in my
+framework.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref "my activities"
+  magit
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defvar-keymap my-activity-magit-keymap
+    :doc "Keymap for my activity 'magit' related commands"
+    :parent my-activity-keymap)
+
+  (add-to-list 'my-activity-specific-keymaps
+  	     `(magit . ,my-activity-magit-keymap))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref "init functions of activities"
+  (magit ,(lambda () (magit)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+  	     '("magit: *" (display-buffer-full-frame)))
 #+end_src
 
 * Org File
