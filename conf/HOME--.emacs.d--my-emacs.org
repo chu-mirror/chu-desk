@@ -140,13 +140,17 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
   		  (alist-get av my-activity-specific-keymaps)))
 #+end_src
 
+#+begin_src emacs-lisp :tangle no :noweb-ref "initialization of |av| on |tab|"
+  (my--set-activity-specific-keymap av)
+#+end_src
+
 #+begin_src emacs-lisp
   (add-to-list
    'tab-bar-tab-post-select-functions
    (lambda (ft tt)
      (let ((av (alist-get 'my-activity tt)))
        (my--set-activity-specific-keymap av))))
-
+  
   (add-hook
    'desktop-after-read-hook
    (lambda ()
@@ -329,16 +333,6 @@ can not be classified in previous chapters.
   (global-set-key (kbd "C-M-k") 'windmove-up)
   (global-set-key (kbd "C-M-l") 'windmove-right)
 #+end_src
-* Miscellaneous
-
-#+begin_src emacs-lisp
-  (setq org-confirm-babel-evaluate nil)
-  (use-package python
-    :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     (cons '(python . t) org-babel-load-languages)))
-#+end_src
 
 * General Editing
 The most important activity is undoubtedly editing.
@@ -358,15 +352,76 @@ This chapter gives a common settings for all specific editing activities.
 #+end_src
 
 Some people might think of writing as simply output of thought,
-but it's actually a combination of input and output. When writing, writers of
+but it's actually combination of input and output. When writing, writers of
 articles have to check dictionaries, writers of research papers have to
 read other papers, writer of code, or programmer, have to check
 document, other part of code, debugging output, to get thought clearer
 and eventually let thought flow out.
 
-Reading is indivisible from writing. To make reading more comfortable
-when writing, I seperate the root window to two parts:
-editing part and referencing part.
+Reading is indivisible from writing, so to make reading more comfortable
+while writing, I seperate the root window equally and horizontally
+to two child windows: editing area and referencing area.
+The child windows of each area is aranged vertically.
+If the root window is not splited horizontally, the whole of it is
+editing area. In this case, referencing area is nil.
+
+This setting is good for a screen of normal size, for usually I
+use only two columns of windows.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defun my-activity-editing-area (&optional window)
+    (let* ((win (or window (selected-window)))
+  	 (root (frame-root-window win)))
+      (unless (eq win root)
+        (while (not (eq (window-parent win) root))
+  	(setq win (window-parent win))))
+      win))
+
+  (defun my-activity-editing-editing-area (&optional window)
+    (let ((root (frame-root-window window))
+  	(area (my-activity-editing-area window)))
+      (if (window-combined-p area t)
+  	(window-left-child root)
+        root)))
+
+  (defun my-activity-editing-referencing-area (&optional window)
+    (let ((root (frame-root-window window))
+  	(area (my-activity-editing-area window)))
+      (if (window-combined-p area t)
+  	(window-next-sibling (window-left-child root))
+        nil)))
+
+  (defun my-activity-editing-in-editing-area-p (&optional window)
+    (eq (my-activity-editing-area window)
+        (my-activity-editing-editing-area window)))
+
+  (defun my-activity-editing-in-referencing-area-p (&optional window)
+    (not (my-activity-editing-in-editing-area-p window)))
+#+end_src
+
+After the determination of area, there are some convenient commands.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref helpers
+  (defun my-activity-editing-close-referencing-area (&optional window)
+    (interactive)
+    (delete-window (my-activity-editing-referencing-area window)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
+#+end_src
+
+* Org File
+
+#+begin_src emacs-lisp
+  (setq org-src-window-setup 'split-window-below)  
+  (setq org-confirm-babel-evaluate nil)
+  (use-package python
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     (cons '(python . t) org-babel-load-languages)))
+#+end_src
 
 * Bibliography
 - [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
