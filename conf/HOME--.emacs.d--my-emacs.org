@@ -28,6 +28,10 @@ functions have a name starting with 'my', and if it's only used in this file,
 * Package Management
 I use the macro 'use-package' to manage packages,
 which is distributed with Emacs from 29.1, including installing, configuring.
+The configuring in each using of use-package is limited to a small set
+of possible options. The complete configuration is scattered throughout
+this file. The usage of 'use-package' here is just an enhanced version
+of 'require'.
 
 To automatically install the used packages, this option is enabled.
 #+begin_src emacs-lisp :tangle yes
@@ -250,7 +254,7 @@ where the object is to perform an editing.
 There's a general purpose framework to select a particular object
 from a set of candidate. I introduce it here because it's used everywhere.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :noweb-ref dependencies
   (use-package helm
     :demand t
     :config
@@ -267,7 +271,7 @@ The following sections are named following a pattern of "SCOPE: TYPE OF OBJECT".
 If the searching and the editing is limited in a single file,
 I prefer vi's key bindings than Emacs's originals.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :noweb-ref dependencies
   (use-package evil
     :demand t
     :config
@@ -304,11 +308,10 @@ I use project.el for this job.
 It's convenient if we can go beyond plain text, and operate on the structure
 of source code directly. LSP is good for this purpose.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :noweb-ref dependencies
   (use-package eglot
+    :demand t
     :custom (eglot-extend-to-xref t)
-    :config
-    (add-to-list 'eglot-server-programs '(python-mode . ("uv" "run" "ruff" "server")))
     :bind (:map eglot-mode-map
   	      ("C-c h" . eldoc)
   	      ("C-c f" . xref-find-definitions))
@@ -371,7 +374,7 @@ Some people might think of writing as simply output of thought,
 but it's actually combination of input and output. When writing, writers of
 articles have to check dictionaries, writers of research papers have to
 read other papers, writer of code, or programmer, have to check
-document, other part of code, debugging output, to get thought clearer
+document, other part of code, debugger output, to get thought clearer
 and eventually let thought flow out.
 
 Reading is indivisible from writing, so to make reading more comfortable
@@ -427,6 +430,21 @@ After the determination of area, there are some convenient commands.
   (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
 #+end_src
 
+* Programming
+
+#+begin_src emacs-lisp :noweb-ref "my activities"
+  programming
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref helpers
+  (defvar-keymap my-activity-programming-keymap
+    :doc "Keymap for my activity 'programming' related commands"
+    :parent my-activity-editing-keymap)
+
+  (add-to-list 'my-activity-specific-keymaps
+  	     `(programming . ,my-activity-programming-keymap))
+#+end_src
+
 * Using Git
 I use magit for this job. It's an useful package, but the using is
 itself an activity, so I should give it a dedicated label in my
@@ -468,13 +486,26 @@ The state of magit is not so useful.
 #+begin_src emacs-lisp :tangle yes
   (setq org-src-window-setup 'split-window-below)  
   (setq org-confirm-babel-evaluate nil)
-  (use-package python
-    :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     (cons '(python . t) org-babel-load-languages)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   (cons '(python . t) org-babel-load-languages))
+#+end_src
+
+* Agda
+
+chu_desk_add_custom_dep(agda)m4_dnl
+#+begin_src emacs-lisp :noweb-ref dependencies
+  (load-file (let ((coding-system-for-read 'utf-8))
+               (shell-command-to-string "agda-mode locate")))
+#+end_src
+
+* Python
+
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'eglot-server-programs '(python-mode . ("uv" "run" "ruff" "server")))
 #+end_src
 
 * Bibliography
 - [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
+  
   

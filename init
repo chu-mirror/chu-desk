@@ -1,5 +1,5 @@
 #!/bin/sh
 
-PREMISES=build-essential sudo aptitude
+PREMISES=build-essential sudo aptitude git
 
 apt-get install $PREMISES
