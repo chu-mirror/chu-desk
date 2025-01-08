@@ -8,7 +8,7 @@ This file gives a detailed description of my emacs configuration,
 and moreover, thanks to the support for literate programming of org-mode,
 it's executable.
 
-The structure of this file is simply a serial of loosely coupled commands,
+The structure of this file is simply a series of loosely coupled commands,
 like all other people's emacs configuration. All dependencies are gathered
 and placed at the beginning to retain an uniform set of names thoughout
 the configuring. The same reason is also applied to helpers. All helper
@@ -63,11 +63,11 @@ and makes them more efficient.
 ** Activity
 Related actions are usually taken in a common context, like renaming, deleting, moving
 file in Windows' file explorer. Emacs's command and buffer is also such
-an example, but sometimes we would like to have multiple cooperating buffers to
+an example, but sometimes we would like to have multiple buffers cooperating to
 achieve some bigger objects. For example, using gdb to debug a C program
 usually requires multiple buffers, one to show current state of the running program,
 one to show referenced source code, one to instruct gdb, etc. Not only it involves
-multiple buffers, but also it consists of a serial of commands to fully accomplish
+multiple buffers, but also it consists of a series of commands to fully accomplish
 its object.
 I call such long lasting actions as activities, in contrast with commands in Emacs
 that have immediate effect.
@@ -89,7 +89,7 @@ There's an activity for default behaviour when no activity specified.
 
 Some mechanisms should be used to specify which activity is being taken. I use tab bar
 for this task. Each tab has an activity attached. To take an activity means
-work on a new tab, and that tab has the activity attached.
+to work on a new tab, and that tab has the activity attached.
 
 #+begin_src emacs-lisp :tangle yes
   (setq tab-bar-tab-hints t)
@@ -133,7 +133,7 @@ I bind these activity related commands under C-x a. This will override
 keybindings for abbreviation, but it doesn't matter because I don't use them.
 #+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-keymap
-    :doc "Keymap for my activity related commands"
+    :doc "Keymap for activity related commands"
     "t" #'my-take-activity
     "c" #'my-current-activity)
 
@@ -165,7 +165,7 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
 Activity specific keymaps inherit from my-activity-keymap.
 #+begin_src emacs-lisp :noweb-ref helpers
     (defvar-keymap my-activity-emacs-keymap
-      :doc "Keymap for my activity 'emacs' related commands"
+      :doc "Keymap for activity 'emacs' related commands"
       :parent my-activity-keymap)
 
     (add-to-list 'my-activity-specific-keymaps
@@ -175,7 +175,7 @@ Activity specific keymaps inherit from my-activity-keymap.
 The context of activities consists of a set of buffers, a set of rules to display buffers,
 a current state, some activity specific commands.
 
-I will not assign each buffer a single activity, because different activities might
+I will not assign a single activity to each buffer, because different activities might
 deal with same buffer at the same time. For example, if I regard editing source file
 and debugging as two different activities, then which activity should I assign for
 the source file both for editing and debuging?
@@ -197,7 +197,7 @@ regulation on it. The following helper creates conditions for display-buffer-ali
 #+end_src
 
 The state of activities is limited to the ones desktop.el can save.
-Some activities might dont need to save state. Close the corresponding tabs
+Some activities might need not to save state. Close the corresponding tabs
 when quiting Emacs.
 
 #+begin_src emacs-lisp :noweb-ref helpers
@@ -247,12 +247,12 @@ buffer scratch.
 #+end_src
 
 ** Searching and Editing
-These two concepts are too closly binded to explain one while ignoring another.
+These two concepts are too closly binded to explain one while not mentioning the other.
 You must know what to edit to define objects to search, and you must know
 where the object is to perform an editing.
 
-There's a general purpose framework to select a particular object
-from a set of candidate. I introduce it here because it's used everywhere.
+There's a general purpose framework to select an object
+from a set of candidates. I introduce it here because it's used everywhere.
 
 #+begin_src emacs-lisp :noweb-ref dependencies
   (use-package helm
@@ -274,8 +274,13 @@ I prefer vi's key bindings than Emacs's originals.
 #+begin_src emacs-lisp :noweb-ref dependencies
   (use-package evil
     :demand t
+    :custom
+    (evil-want-C-u-delete t)
+    (evil-want-C-u-scroll t)
+    (evil-want-Y-yank-to-eol t)
     :config
     (evil-mode 1)
+    (define-key evil-normal-state-map (kbd "M-.") nil t)
     (evil-set-initial-state 'Info-mode 'emacs)
     (evil-set-initial-state 'dired-mode 'emacs)
     (evil-set-initial-state 'Man-mode 'emacs)
@@ -288,7 +293,7 @@ I prefer vi's key bindings than Emacs's originals.
 I sometimes input CJK characters.
 
 chu_desk_add_dep(librime-dev)
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :noweb-ref dependencies
   (use-package rime
     :custom
     (default-input-method "rime")
@@ -301,7 +306,6 @@ chu_desk_add_dep(librime-dev)
 I use project.el for this job.
 
 - project-find-regexp (C-x p g)
-- project-search
 - project-query-replace-regexp (C-x p r)
 
 *** Project: Source Code
@@ -313,12 +317,11 @@ of source code directly. LSP is good for this purpose.
     :demand t
     :custom (eglot-extend-to-xref t)
     :bind (:map eglot-mode-map
-  	      ("C-c h" . eldoc)
-  	      ("C-c f" . xref-find-definitions))
+  	      ("C-c h" . eldoc))
     :hook
-    ((c-mode . eglot-ensure)
-     (c++-mode . eglot-ensure)
-     (python-mode . eglot-ensure)))
+    (
+     <<the major modes that make use of eglot>>
+     ))
 #+end_src
 
 *** Project: File
@@ -333,7 +336,7 @@ A shortcut to access the directory that contains all local repositories.
     (interactive)
     (dired (getenv "REPOSITORY_HOME")))
 
-  (global-set-key (kbd "C-x c d") 'my-dired-reps)
+  (define-key my-activity-keymap (kbd "d") 'my-dired-reps)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -363,7 +366,7 @@ This chapter gives a common settings for all specific editing activities.
 
 #+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-editing-keymap
-    :doc "Keymap for my activity 'editing' related commands"
+    :doc "Keymap for activity 'editing' related commands"
     :parent my-activity-keymap)
 
   (add-to-list 'my-activity-specific-keymaps
@@ -430,21 +433,6 @@ After the determination of area, there are some convenient commands.
   (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
 #+end_src
 
-* Programming
-
-#+begin_src emacs-lisp :noweb-ref "my activities"
-  programming
-#+end_src
-
-#+begin_src emacs-lisp :noweb-ref helpers
-  (defvar-keymap my-activity-programming-keymap
-    :doc "Keymap for my activity 'programming' related commands"
-    :parent my-activity-editing-keymap)
-
-  (add-to-list 'my-activity-specific-keymaps
-  	     `(programming . ,my-activity-programming-keymap))
-#+end_src
-
 * Using Git
 I use magit for this job. It's an useful package, but the using is
 itself an activity, so I should give it a dedicated label in my
@@ -465,7 +453,7 @@ The state of magit is not so useful.
 
 #+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-magit-keymap
-    :doc "Keymap for my activity 'magit' related commands"
+    :doc "Keymap for activity 'magit' related commands"
     :parent my-activity-keymap)
 
   (add-to-list 'my-activity-specific-keymaps
@@ -491,6 +479,31 @@ The state of magit is not so useful.
    (cons '(python . t) org-babel-load-languages))
 #+end_src
 
+* Programming
+
+#+begin_src emacs-lisp :noweb-ref "my activities"
+  programming
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref helpers
+  (defvar-keymap my-activity-programming-keymap
+    :doc "Keymap for activity 'programming' related commands"
+    :parent my-activity-editing-keymap)
+
+  (add-to-list 'my-activity-specific-keymaps
+  	     `(programming . ,my-activity-programming-keymap))
+#+end_src
+
+* C
+#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
+  (c-mode . eglot-ensure)
+#+end_src
+
+* C++
+#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
+  (c++-mode . eglot-ensure)
+#+end_src
+
 * Agda
 
 chu_desk_add_custom_dep(agda)m4_dnl
@@ -500,6 +513,10 @@ chu_desk_add_custom_dep(agda)m4_dnl
 #+end_src
 
 * Python
+     
+#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
+  (python-mode . eglot-ensure)
+#+end_src
 
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'eglot-server-programs '(python-mode . ("uv" "run" "ruff" "server")))
