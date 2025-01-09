@@ -385,7 +385,7 @@ while writing, I seperate the root window equally and horizontally
 to two child windows: editing area and referencing area.
 The child windows of each area is aranged vertically.
 If the root window is not splited horizontally, the whole of it is
-editing area. In this case, referencing area is nil.
+an editing area. In this case, the referencing area is nil.
 
 This setting is good for a screen of normal size, for usually I
 use only two columns of windows.
@@ -394,7 +394,7 @@ use only two columns of windows.
   (defun my-activity-editing-area (&optional window)
     (let* ((win (or window (selected-window)))
   	 (root (frame-root-window win)))
-      (if (window-combined-p root t)
+      (if (window-left-child root)
   	(unless (eq win root)
   	  (while (not (eq (window-parent win) root))
   	    (setq win (window-parent win))))
@@ -402,18 +402,12 @@ use only two columns of windows.
       win))
 
   (defun my-activity-editing-editing-area (&optional window)
-    (let ((root (frame-root-window window))
-  	(area (my-activity-editing-area window)))
-      (if (window-combined-p area t)
-  	(window-left-child root)
-        root)))
+    (let ((root (frame-root-window window)))
+      (or (window-left-child root) root)))
 
   (defun my-activity-editing-referencing-area (&optional window)
-    (let ((root (frame-root-window window))
-  	(area (my-activity-editing-area window)))
-      (if (window-combined-p area t)
-  	(window-next-sibling (window-left-child root))
-        nil)))
+    (let ((root (frame-root-window window)))
+      (window-next-sibling (window-left-child root))))
 
   (defun my-activity-editing-in-editing-area-p (&optional window)
     (eq (my-activity-editing-area window)
