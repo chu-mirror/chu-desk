@@ -443,52 +443,6 @@ After the determination of area, there are some convenient commands.
   (keymap-set my-activity-editing-keymap "m" #'my-activity-editing-move-to-referencing-area)
 #+end_src
 
-* Using Git
-I use magit for this job. It's an useful package, but the using is
-itself an activity, so I should give it a dedicated label in my
-framework.
-
-#+begin_src emacs-lisp :noweb-ref "my activities"
-  magit
-#+end_src
-
-The state of magit is not so useful.
-#+begin_src emacs-lisp :noweb-ref "activities to discard state"
-  magit
-#+end_src
-
-#+begin_src emacs-lisp :noweb-ref dependencies
-  (use-package magit)
-#+end_src
-
-#+begin_src emacs-lisp :noweb-ref helpers
-  (defvar-keymap my-activity-magit-keymap
-    :doc "Keymap for activity 'magit' related commands"
-    :parent my-activity-keymap)
-
-  (add-to-list 'my-activity-specific-keymaps
-  	     `(magit . ,my-activity-magit-keymap))
-#+end_src
-
-#+begin_src emacs-lisp :noweb-ref "init functions of activities"
-  (magit ,(lambda () (magit)))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-  (add-to-list 'display-buffer-alist
-  	     '("magit: *" (display-buffer-full-frame)))
-#+end_src
-
-* Org File
-
-#+begin_src emacs-lisp :tangle yes
-  (setq org-src-window-setup 'split-window-below)  
-  (setq org-confirm-babel-evaluate nil)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   (cons '(python . t) org-babel-load-languages))
-#+end_src
-
 * Programming
 
 #+begin_src emacs-lisp :noweb-ref "my activities"
@@ -504,17 +458,17 @@ The state of magit is not so useful.
   	     `(programming . ,my-activity-programming-keymap))
 #+end_src
 
-* C
+** C
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (c-mode . eglot-ensure)
 #+end_src
 
-* C++
+** C++
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (c++-mode . eglot-ensure)
 #+end_src
 
-* Agda
+** Agda
 
 chu_desk_add_custom_dep(agda)m4_dnl
 #+begin_src emacs-lisp :noweb-ref dependencies
@@ -522,7 +476,7 @@ chu_desk_add_custom_dep(agda)m4_dnl
                (shell-command-to-string "agda-mode locate")))
 #+end_src
 
-* Python
+** Python
      
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (python-mode . eglot-ensure)
@@ -530,6 +484,52 @@ chu_desk_add_custom_dep(agda)m4_dnl
 
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'eglot-server-programs '(python-mode . ("uv" "run" "ruff" "server")))
+#+end_src
+
+* Version Control
+I use magit for this job. It's an useful package, but the using is
+itself an activity, so I should give it a dedicated label in my
+framework.
+
+#+begin_src emacs-lisp :noweb-ref "my activities"
+  vc
+#+end_src
+
+The state of magit is not so useful.
+#+begin_src emacs-lisp :noweb-ref "activities to discard state"
+  vc
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref dependencies
+  (use-package magit)
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref helpers
+  (defvar-keymap my-activity-vc-keymap
+    :doc "Keymap for activity 'vc related commands"
+    :parent my-activity-keymap)
+
+  (add-to-list 'my-activity-specific-keymaps
+  	     `(vc . ,my-activity-vc-keymap))
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref "init functions of activities"
+  (vc ,(lambda () (magit)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'display-buffer-alist
+  	     '("magit: *" (display-buffer-full-frame)))
+#+end_src
+
+* Org File
+
+#+begin_src emacs-lisp :tangle yes
+  (setq org-src-window-setup 'split-window-below)  
+  (setq org-confirm-babel-evaluate nil)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   (cons '(python . t) org-babel-load-languages))
 #+end_src
 
 * Bibliography
