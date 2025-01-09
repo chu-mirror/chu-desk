@@ -425,17 +425,17 @@ After the determination of area, there are some convenient commands.
     (delete-window (my-activity-editing-referencing-area window)))
 
   (defun my--activity-editing-display-buffer-in-referencing-area (buffer alist)
-    (let* ((ref (or (my-activity-editing-referencing-area)
-  		  (split-root-window-right))))
-      (window--display-buffer buffer ref 'reuse alist)))
+    (let ((ref (my-activity-editing-referencing-area)))
+      (when ref
+        (delete-window ref))
+      (window--display-buffer buffer (split-root-window-right) 'reuse alist)))
 
   (defun my-activity-editing-move-to-referencing-area (&optional window)
     (interactive)
     (let* ((win (or window (selected-window)))
   	 (buf (window-buffer win)))
-      (unless (my-activity-editing-in-referencing-area-p win)
-        (display-buffer buf '(my--activity-editing-display-buffer-in-referencing-area))
-        (delete-window win))))
+      (delete-window win)
+      (display-buffer buf '(my--activity-editing-display-buffer-in-referencing-area))))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
