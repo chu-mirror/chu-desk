@@ -280,7 +280,7 @@ I prefer vi's key bindings than Emacs's originals.
     (evil-want-Y-yank-to-eol t)
     :config
     (evil-mode 1)
-    (define-key evil-normal-state-map (kbd "M-.") nil t)
+    (keymap-unset evil-normal-state-map "M-." t)
     (evil-set-initial-state 'Info-mode 'emacs)
     (evil-set-initial-state 'dired-mode 'emacs)
     (evil-set-initial-state 'Man-mode 'emacs)
@@ -336,7 +336,7 @@ A shortcut to access the directory that contains all local repositories.
     (interactive)
     (dired (getenv "REPOSITORY_HOME")))
 
-  (define-key my-activity-keymap (kbd "d") 'my-dired-reps)
+  (keymap-set my-activity-keymap "d" 'my-dired-reps)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -346,7 +346,7 @@ A shortcut to access the directory that contains all local repositories.
 #+end_src
 
 ** Meta
-This set of actions take effect on Emacs, like buffer, window, etc, which
+These actions take effect on Emacs, like buffer, window, etc, which
 can not be classified in previous chapters.
 
 #+begin_src emacs-lisp :tangle yes
@@ -376,8 +376,8 @@ This chapter gives a common settings for all specific editing activities.
 Some people might think of writing as simply output of thought,
 but it's actually combination of input and output. When writing, writers of
 articles have to check dictionaries, writers of research papers have to
-read other papers, writer of code, or programmer, have to check
-document, other part of code, debugger output, to get thought clearer
+read other papers, writers of code, or programmers, have to check
+document, other part of code, debugger output, to get thought more clear
 and eventually let thought flow out.
 
 Reading is indivisible from writing, so to make reading more comfortable
@@ -394,9 +394,11 @@ use only two columns of windows.
   (defun my-activity-editing-area (&optional window)
     (let* ((win (or window (selected-window)))
   	 (root (frame-root-window win)))
-      (unless (eq win root)
-        (while (not (eq (window-parent win) root))
-  	(setq win (window-parent win))))
+      (if (window-combined-p root t)
+  	(unless (eq win root)
+  	  (while (not (eq (window-parent win) root))
+  	    (setq win (window-parent win))))
+        (setq win root))
       win))
 
   (defun my-activity-editing-editing-area (&optional window)
@@ -427,10 +429,24 @@ After the determination of area, there are some convenient commands.
   (defun my-activity-editing-close-referencing-area (&optional window)
     (interactive)
     (delete-window (my-activity-editing-referencing-area window)))
+
+  (defun my--activity-editing-display-buffer-in-referencing-area (buffer alist)
+    (let* ((ref (or (my-activity-editing-referencing-area)
+  		  (split-root-window-right))))
+      (window--display-buffer buffer ref 'reuse alist)))
+
+  (defun my-activity-editing-move-to-referencing-area (&optional window)
+    (interactive)
+    (let* ((win (or window (selected-window)))
+  	 (buf (window-buffer win)))
+      (unless (my-activity-editing-in-referencing-area-p win)
+        (display-buffer buf '(my--activity-editing-display-buffer-in-referencing-area))
+        (delete-window win))))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
   (keymap-set my-activity-editing-keymap "h" #'my-activity-editing-close-referencing-area)
+  (keymap-set my-activity-editing-keymap "m" #'my-activity-editing-move-to-referencing-area)
 #+end_src
 
 * Using Git
