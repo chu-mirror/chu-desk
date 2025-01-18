@@ -25,6 +25,21 @@ m4_dnl I prefer vis than vim
 chu_desk_add_dep(vis)m4_dnl
 export EDITOR=vi
 
+m4_dnl TeX
+chu_desk_add_dep(texlive-full)m4_dnl
+chu_desk_add_dep(pandoc)m4_dnl
+chu_desk_add_dep(mupdf)m4_dnl
+
+m4_dnl Font
+chu_desk_add_dep(fontconfig)m4_dnl
+chu_desk_add_dep(fonts-noto-cjk)m4_dnl
+
+chu_desk_add_custom_dep(pandoc-latex-template)m4_dnl
+pdfmarkdown () {
+    pandoc $1 -o `basename $1 .md`.pdf --from markdown+tex_math_dollars \
+        --listings --pdf-engine "xelatex" -V CJKmainfont="Noto Serif CJK SC"
+}
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
