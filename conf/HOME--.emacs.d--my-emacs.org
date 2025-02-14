@@ -16,10 +16,8 @@ functions have a name starting with 'my', and if it's only used in this file,
 'my' is followed by '--', else '-'.
 
 #+begin_src emacs-lisp :tangle yes
-  (setq package-archives
-        '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
-          ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+  (add-to-list 'package-archives
+        '("melpa-stable" . "https://stable.melpa.org/packages/"))
   (package-initialize)
   <<dependencies>>
   <<helpers>>
