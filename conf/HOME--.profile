@@ -40,6 +40,15 @@ pdfmarkdown () {
         --listings --pdf-engine "xelatex" -V CJKmainfont="Noto Serif CJK SC"
 }
 
+chu_desk_add_dep(pkg-config)m4_dnl
+chu_desk_add_dep(sqlite3)m4_dnl
+chu_desk_add_dep(libsqlite3-dev)m4_dnl
+chu_desk_add_dep(libgtk-3-dev)m4_dnl
+chu_desk_add_dep(libtree-sitter-dev)m4_dnl
+chu_desk_add_dep(libxpm-dev)m4_dnl
+chu_desk_add_dep(libgif-dev)m4_dnl
+chu_desk_add_dep(libgnutls28-dev)m4_dnl
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
