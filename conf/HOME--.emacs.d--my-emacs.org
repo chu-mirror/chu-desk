@@ -34,7 +34,7 @@ this file. The usage of 'use-package' here is just an enhanced version
 of 'require'.
 
 To automatically install the used packages, this option is enabled.
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :noweb-ref dependencies
   (setq use-package-always-ensure t)
 #+end_src
 
