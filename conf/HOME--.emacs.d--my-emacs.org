@@ -285,8 +285,10 @@ I prefer vi's key bindings than Emacs's originals.
     (evil-set-initial-state 'Man-mode 'emacs)
     (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
     (evil-set-initial-state 'help-mode 'emacs))
-  (use-package evil-org
-    :hook org-mode)
+  (use-package evil-commentary
+    :demand t
+    :config
+    (evil-commentary-mode))
 #+end_src
 
 I sometimes input CJK characters.

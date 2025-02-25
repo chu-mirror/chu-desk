@@ -22,6 +22,7 @@ PATH="$CARGO_HOME/bin:$PATH"
 export CARGO_HOEM
 
 chu_desk_add_dep(vim)m4_dnl
+chu_desk_add_custom_dep(vim-addons)m4_dnl
 export EDITOR=vi
 
 m4_dnl TeX
