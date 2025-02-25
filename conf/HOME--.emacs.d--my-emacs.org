@@ -16,6 +16,7 @@ functions have a name starting with 'my', and if it's only used in this file,
 'my' is followed by '--', else '-'.
 
 #+begin_src emacs-lisp :tangle yes
+  (require 'package)
   (add-to-list 'package-archives
         '("melpa-stable" . "https://stable.melpa.org/packages/"))
   (package-initialize)
@@ -43,6 +44,9 @@ Here is some basic settings for a not disturbing looking.
   (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 150)
   (setq project-mode-line t)
+  (tool-bar-mode -1)
+  (set-scroll-bar-mode nil)
+  (menu-bar-mode -1)
 #+end_src
 
 * Action
