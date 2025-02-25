@@ -40,11 +40,8 @@ To automatically install the used packages, this option is enabled.
 Here is some basic settings for a not disturbing looking.
 
 #+begin_src emacs-lisp :tangle yes
-  (tool-bar-mode -1)
-  (set-scroll-bar-mode nil)
-  (menu-bar-mode -1)
-  (add-to-list 'default-frame-alist
-  	     '(font . "DejaVu Sans Mono-17"))
+  (load-theme 'modus-operandi)
+  (set-face-attribute 'default nil :height 150)
   (setq project-mode-line t)
 #+end_src
 
@@ -266,7 +263,7 @@ from a set of candidates. I introduce it here because it's used everywhere.
 The following sections are named following a pattern of "SCOPE: TYPE OF OBJECT".
 
 *** File: Plain Text
-If the searching and the editing is limited in a single file,
+If the searching and the editing is limited to a single file,
 I prefer vi's key bindings than Emacs's originals.
 
 #+begin_src emacs-lisp :noweb-ref dependencies
