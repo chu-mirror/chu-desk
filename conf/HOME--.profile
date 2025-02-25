@@ -21,8 +21,7 @@ CARGO_HOME="$HOME/.cargo"
 PATH="$CARGO_HOME/bin:$PATH"
 export CARGO_HOEM
 
-m4_dnl I prefer vis than vim
-chu_desk_add_dep(vis)m4_dnl
+chu_desk_add_dep(vim)m4_dnl
 export EDITOR=vi
 
 m4_dnl TeX
