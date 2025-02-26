@@ -20,6 +20,7 @@ functions have a name starting with 'my', and if it's only used in this file,
   (add-to-list 'package-archives
         '("melpa-stable" . "https://stable.melpa.org/packages/"))
   (package-initialize)
+  (add-to-list 'load-path (expand-file-name "package" user-emacs-directory))
   <<dependencies>>
   <<helpers>>
 #+end_src
@@ -289,6 +290,9 @@ I prefer vi's key bindings than Emacs's originals.
     :demand t
     :config
     (evil-commentary-mode))
+  (require 'evil-textobj-entire)
+  (define-key evil-outer-text-objects-map evil-textobj-entire-key 'evil-entire-entire-buffer)
+  (define-key evil-inner-text-objects-map evil-textobj-entire-key 'evil-entire-entire-buffer)
 #+end_src
 
 I sometimes input CJK characters.
