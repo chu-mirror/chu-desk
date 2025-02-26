@@ -54,8 +54,8 @@ Here is some basic settings for a not disturbing looking.
 * Action
 People believe that Emacs is a general purpose interface to
 computing infrastructure rather than just an editor. It's correct
-in some extent. Of course, Emacs can not compete a real operating system,
-but for a limited set of actions, Emacs can do amazingly well.
+to some extent. Of course, Emacs can not compete a real operating system,
+but for a particular set of actions, Emacs can do amazingly well.
 Action here means "copying a file into a directory", "modifying some code", etc.
 
 This file's main purpose is to explain the set of actions that I perform on Emacs,
@@ -91,7 +91,7 @@ There's an activity for default behaviour when no activity specified.
 
 Some mechanisms should be used to specify which activity is being taken. I use tab bar
 for this task. Each tab has an activity attached. To take an activity means
-to work on a new tab, and that tab has the activity attached.
+to work on a new tab, and that tab has that activity attached.
 
 #+begin_src emacs-lisp :tangle yes
   (setq tab-bar-tab-hints t)
@@ -165,7 +165,7 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
        (my--set-activity-specific-keymap av))))
 #+end_src
 
-Activity specific keymaps inherit from my-activity-keymap.
+Activity specific keymaps inherit bindings from my-activity-keymap.
 
 #+begin_src emacs-lisp :noweb-ref helpers
     (defvar-keymap my-activity-emacs-keymap
@@ -180,7 +180,7 @@ The context of activities consists of a set of buffers, a set of rules to displa
 a current state, some activity specific commands.
 
 I will not assign a single activity to each buffer, because different activities might
-deal with same buffer at the same time. For example, if I regard editing source file
+deal with a same buffer at the same time. For example, if I regard editing source file
 and debugging as two different activities, then which activity should I assign for
 the source file both for editing and debuging?
 So I decide to delay the determination of the set of buffers
