@@ -280,17 +280,27 @@ I prefer vi's key bindings than Emacs's originals.
     (evil-want-Y-yank-to-eol t)
     :config
     (evil-mode 1)
-    (keymap-unset evil-normal-state-map "M-." t)
-    (evil-set-initial-state 'Info-mode 'emacs)
-    (evil-set-initial-state 'dired-mode 'emacs)
-    (evil-set-initial-state 'Man-mode 'emacs)
-    (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
-    (evil-set-initial-state 'help-mode 'emacs))
   (use-package evil-commentary
     :demand t
     :config
     (evil-commentary-mode))
   (require 'evil-textobj-entire)
+#+end_src
+
+Vi's key bindings are messing when not dealing with plain text.
+
+#+begin_src emacs-lisp :tangle yes
+  (evil-set-initial-state 'Info-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'Man-mode 'emacs)
+  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+  (evil-set-initial-state 'help-mode 'emacs))
+#+end_src
+
+Some modification to key bindings.
+
+#+begin_src emacs-lisp :tangle yes
+  (keymap-unset evil-normal-state-map "M-." t)
   (define-key evil-outer-text-objects-map evil-textobj-entire-key 'evil-entire-entire-buffer)
   (define-key evil-inner-text-objects-map evil-textobj-entire-key 'evil-entire-entire-buffer)
 #+end_src
