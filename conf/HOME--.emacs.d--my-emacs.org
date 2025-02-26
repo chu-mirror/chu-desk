@@ -517,13 +517,13 @@ itself an activity, so I should give it a dedicated label in my
 framework.
 
 #+begin_src emacs-lisp :noweb-ref "my activities"
-  vc
+  magit
 #+end_src
 
 The state of magit is not so useful.
 
 #+begin_src emacs-lisp :noweb-ref "activities to discard state"
-  vc
+  magit
 #+end_src
 
 #+begin_src emacs-lisp :noweb-ref dependencies
@@ -531,16 +531,16 @@ The state of magit is not so useful.
 #+end_src
 
 #+begin_src emacs-lisp :noweb-ref helpers
-  (defvar-keymap my-activity-vc-keymap
-    :doc "Keymap for activity 'vc related commands"
+  (defvar-keymap my-activity-magit-keymap
+    :doc "Keymap for activity 'magit related commands"
     :parent my-activity-keymap)
 
   (add-to-list 'my-activity-specific-keymaps
-  	     `(vc . ,my-activity-vc-keymap))
+  	     `(magit . ,my-activity-magit-keymap))
 #+end_src
 
 #+begin_src emacs-lisp :noweb-ref "init functions of activities"
-  (vc ,(lambda () (magit)))
+  (magit ,(lambda () (magit)))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
