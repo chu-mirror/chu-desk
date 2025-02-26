@@ -34,6 +34,7 @@ this file. The usage of 'use-package' here is just an enhanced version
 of 'require'.
 
 To automatically install the used packages, this option is enabled.
+
 #+begin_src emacs-lisp :noweb-ref dependencies
   (setq use-package-always-ensure t)
 #+end_src
@@ -83,6 +84,7 @@ that have immediate effect.
 #+end_src
 
 There's an activity for default behaviour when no activity specified.
+
 #+begin_src emacs-lisp :noweb-ref "my activities"
   emacs
 #+end_src
@@ -131,6 +133,7 @@ to work on a new tab, and that tab has the activity attached.
 
 I bind these activity related commands under C-x a. This will override
 keybindings for abbreviation, but it doesn't matter because I don't use them.
+
 #+begin_src emacs-lisp :noweb-ref helpers
   (defvar-keymap my-activity-keymap
     :doc "Keymap for activity related commands"
@@ -163,6 +166,7 @@ keybindings for abbreviation, but it doesn't matter because I don't use them.
 #+end_src
 
 Activity specific keymaps inherit from my-activity-keymap.
+
 #+begin_src emacs-lisp :noweb-ref helpers
     (defvar-keymap my-activity-emacs-keymap
       :doc "Keymap for activity 'emacs' related commands"
@@ -211,11 +215,14 @@ when quiting Emacs.
   emacs
 #+end_src
 
+I am not sure whether _kill-emacs-hook_ runs after saving desktop file or not,
+so run this when setting up Emacs instead.
+
 #+begin_src emacs-lisp :tangle yes
   (desktop-save-mode 1)
 
   (add-hook
-   'desktop-save-hook
+   'window-setup-hook
    (lambda ()
      (dolist (tab (tab-bar-tabs))
        (when (my-activity-discard-state-p (alist-get 'my-activity tab))
@@ -242,6 +249,7 @@ before embarking on an activity.
 
 The default activity emacs are initialized to a single window displaying
 buffer scratch.
+
 #+begin_src emacs-lisp :noweb-ref "init functions of activities"
   (emacs ,(lambda () (display-buffer "*scratch*" '(display-buffer-full-frame))))
 #+end_src
@@ -474,11 +482,13 @@ After the determination of area, there are some convenient commands.
 #+end_src
 
 ** C
+
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (c-mode . eglot-ensure)
 #+end_src
 
 ** C++
+
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (c++-mode . eglot-ensure)
 #+end_src
@@ -511,6 +521,7 @@ framework.
 #+end_src
 
 The state of magit is not so useful.
+
 #+begin_src emacs-lisp :noweb-ref "activities to discard state"
   vc
 #+end_src
