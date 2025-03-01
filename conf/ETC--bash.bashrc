@@ -39,7 +39,7 @@ function command_not_found_handle {
   sp=$PWD # search path from current directory
   cmd=$1  # the searched command
   shift
-  while [ "$sp" != "$HOME" ]; do
+  while [ "$sp" != "/home" ]; do
     if [ -x "$sp/$CTX_BIN/$cmd" ]; then
       "$sp/$CTX_BIN/$cmd" $@
       unset sp; unset cmd
