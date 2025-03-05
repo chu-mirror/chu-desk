@@ -483,8 +483,18 @@ After the determination of area, there are some convenient commands.
 
 ** C
 
+#+begin_src emacs-lisp :noweb-ref "dependencies"
+  (require 'cc-mode)
+#+end_src
+
 #+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
   (c-mode . eglot-ensure)
+#+end_src
+
+Fix the confict with window movements.
+
+#+begin_src emacs-lisp :tangle yes
+  (keymap-set c-mode-map "C-M-h" nil)
 #+end_src
 
 ** C++
