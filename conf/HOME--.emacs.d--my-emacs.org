@@ -430,7 +430,9 @@ use only two columns of windows.
 
   (defun my-activity-editing-referencing-area (&optional window)
     (let ((root (frame-root-window window)))
-      (window-next-sibling (window-left-child root))))
+      (if (window-left-child root)
+  	(window-next-sibling (my-activity-editing-editing-area window))
+        nil)))
 
   (defun my-activity-editing-in-editing-area-p (&optional window)
     (eq (my-activity-editing-area window)
