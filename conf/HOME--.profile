@@ -42,6 +42,11 @@ pdfmarkdown () {
         --listings --pdf-engine "xelatex" -V CJKmainfont="Noto Serif CJK SC"
 }
 
+chu_desk_add_dep(global)m4_dnl
+chu_desk_add_dep(universal-ctags)m4_dnl
+chu_desk_add_dep(python3-pygments)m4_dnl
+export LESSGLOBALTAGS=global
+
 chu_desk_add_dep(pkg-config)m4_dnl
 chu_desk_add_dep(sqlite3)m4_dnl
 chu_desk_add_dep(libsqlite3-dev)m4_dnl

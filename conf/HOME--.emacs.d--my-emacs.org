@@ -332,22 +332,40 @@ I use project.el for this job.
 - project-query-replace-regexp (C-x p r)
 
 *** Project: Source Code
-It's convenient if we can go beyond plain text, and operate on the structure
-of source code directly. LSP is good for this purpose.
+It's convenient that if we could go beyond plain text and operate on the structure
+of source code directly. LSP is good for this purpose, but I prefer traditional
+tagging systems. They have some advantages over newer choices like LSP.
+For example, they work well when dealing with multiple languages at the same time,
+and I don't have to make sure tools understanding compilation. All I need to
+take care of is just files and text.
 
 #+begin_src emacs-lisp :noweb-ref dependencies
-  (use-package eglot
+  (use-package ggtags
     :demand t
-    :custom (eglot-extend-to-xref t)
-    :bind (:map eglot-mode-map
-  	      ("C-c h" . eldoc))
-    :hook
-    (
-     <<the major modes that make use of eglot>>
-     ))
+    :bind
+    (:map ggtags-mode-map
+  	("C-c n" . ggtags-find-tag-continue))
+    )
+
+  (add-hook
+   'after-change-major-mode-hook
+   (lambda ()
+     (let ((cp (project-current)))
+       (when cp
+         (let* ((pr (project-root cp))
+  	      (gtag (expand-file-name "GTAGS" pr)))
+  	 (when (file-exists-p gtag)
+  	   (ggtags-mode)))))))
+
+  (add-hook
+   'after-save-hook
+   (lambda ()
+     (when ggtags-mode
+       (ggtags-update-tags))))
 #+end_src
 
 *** Project: File
+
 - project-find-file (C-x p f)
 - project-dired (C-x p D)
 
@@ -489,10 +507,6 @@ After the determination of area, there are some convenient commands.
   (require 'cc-mode)
 #+end_src
 
-#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
-  (c-mode . eglot-ensure)
-#+end_src
-
 Fix the confict with window movements.
 
 #+begin_src emacs-lisp :tangle yes
@@ -501,13 +515,10 @@ Fix the confict with window movements.
 
 #+begin_src emacs-lisp :tangle yes
   (setq c-basic-offset 4)
+  (setq-default c-electric-flag nil)
 #+end_src
 
 ** C++
-
-#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
-  (c++-mode . eglot-ensure)
-#+end_src
 
 ** Agda
 
@@ -519,14 +530,6 @@ chu_desk_add_custom_dep(agda)m4_dnl
 
 ** Python
      
-#+begin_src emacs-lisp :noweb-ref "the major modes that make use of eglot"
-  (python-mode . eglot-ensure)
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-  (add-to-list 'eglot-server-programs '(python-mode . ("uv" "run" "ruff" "server")))
-#+end_src
-
 * Version Control
 I use magit for this job. It's an useful package, but the using is
 itself an activity, so I should give it a dedicated label in my
