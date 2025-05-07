@@ -516,6 +516,7 @@ Fix the confict with window movements.
 #+begin_src emacs-lisp :tangle yes
   (setq c-basic-offset 4)
   (setq-default c-electric-flag nil)
+  (add-to-list 'c-default-style '(c-mode . "python"))
 #+end_src
 
 ** C++
