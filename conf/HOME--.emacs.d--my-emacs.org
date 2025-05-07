@@ -577,6 +577,15 @@ The state of magit is not so useful.
    (cons '(python . t) org-babel-load-languages))
 #+end_src
 
+* PDF
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package pdf-tools
+    :config
+    (pdf-tools-install)
+    (pdf-loader-install))
+#+end_src
+
 * Bibliography
 - [[https://karthinks.com/software/emacs-window-management-almanac/][The Emacs window management almanac]]
   
