@@ -1,0 +1,5 @@
+#!/bin/sh
+
+chu_desk_add_dep(clang-format-19)m4_dnl
+
+clang-format-19 -style=file -i $1

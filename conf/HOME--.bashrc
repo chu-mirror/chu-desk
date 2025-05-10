@@ -72,18 +72,5 @@ alias ll='ls -l'
 alias la='ls -A'
 alias l='ls -CF'
 
-chu_desk_add_dep(indent)m4_dnl
-C_STYLE_OPTIONS="
--nbad -bap -sob                 m4_dnl inserting new line
--br -ce -cdw -brs -blf          m4_dnl breaking on brace
--ss -npcs -ncs -bs              m4_dnl spacing
--nut -i4 -ci4 -lp -as           m4_dnl indentation
--l78 -bbo"
-
-format-c() {
-    indent $C_STYLE_OPTIONS $@
-}
-export C_STYLE_OPTIONS
-
 # import context dependent configuration
 [ -f $CTX_HOME/.bashrc ] && . $CTX_HOME/.bashrc
