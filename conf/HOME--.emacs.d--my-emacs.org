@@ -582,6 +582,8 @@ The state of magit is not so useful.
 
 #+begin_src emacs-lisp :tangle yes
   (use-package pdf-tools
+    :custom
+    (pdf-view-use-dedicated-register nil)
     :config
     (pdf-tools-install)
     (pdf-loader-install))
