@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 chu_desk_add_custom_dep(emacs)m4_dnl
 (require 'org)
 (let* ((conf-name "my-emacs.org")

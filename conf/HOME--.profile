@@ -39,7 +39,8 @@ chu_desk_add_dep(fonts-noto-cjk)m4_dnl
 chu_desk_add_custom_dep(pandoc-latex-template)m4_dnl
 pdfmarkdown () {
     pandoc $1 -o `basename $1 .md`.pdf --from markdown+tex_math_dollars \
-        --listings --pdf-engine "xelatex" -V CJKmainfont="Noto Serif CJK SC"
+        --template eisvogel --listings --pdf-engine "xelatex" \
+	-V CJKmainfont="Noto Serif CJK SC"
 }
 
 chu_desk_add_dep(global)m4_dnl

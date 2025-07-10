@@ -16,9 +16,10 @@ functions have a name starting with 'my', and if it's only used in this file,
 'my' is followed by '--', else '-'.
 
 #+begin_src emacs-lisp :tangle yes
+  ;; -*- lexical-binding: t; -*-
   (require 'package)
   (add-to-list 'package-archives
-        '("melpa-stable" . "https://stable.melpa.org/packages/"))
+  	'("melpa-stable" . "https://stable.melpa.org/packages/"))
   (package-initialize)
   (add-to-list 'load-path (expand-file-name "package" user-emacs-directory))
   <<dependencies>>
