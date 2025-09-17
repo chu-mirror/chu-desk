@@ -3,5 +3,5 @@
 dep_file=$1
 all=$(cat "$dep_file")
 for dep in $all; do
-  . install/$dep.sh
+  . manual/$dep.sh
 done
