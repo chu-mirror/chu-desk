@@ -338,7 +338,7 @@ of source code directly. LSP is good for this purpose, but I prefer traditional
 tagging systems. They have some advantages over newer choices like LSP.
 For example, they work well when dealing with multiple languages at the same time,
 and I don't have to make sure tools understanding compilation. All I need to
-take care of is just files and text.
+take care of is just text.
 
 #+begin_src emacs-lisp :noweb-ref dependencies
   (use-package ggtags
@@ -349,14 +349,11 @@ take care of is just files and text.
     )
 
   (add-hook
-   'after-change-major-mode-hook
+   'find-file-hook
    (lambda ()
-     (let ((cp (project-current)))
-       (when cp
-         (let* ((pr (project-root cp))
-  	      (gtag (expand-file-name "GTAGS" pr)))
-  	 (when (file-exists-p gtag)
-  	   (ggtags-mode)))))))
+     (let ((tags-home (locate-dominating-file (buffer-file-name) "GTAGS")))
+       (when tags-home
+         (ggtags-mode)))))
 
   (add-hook
    'after-save-hook
